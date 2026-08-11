@@ -3,8 +3,8 @@ const crypto = require('crypto');
 
 // ===== CONFIGURATION =====
 const META_PIXEL_ID = process.env.META_PIXEL_ID || '1732549614454823';
-const META_ACCESS_TOKEN = process.env.META_ACCESS_TOKEN || 'YOUR_ACCESS_TOKEN_HERE';
-const WEBFLOW_SECRET = process.env.WEBFLOW_SECRET || 'whsec_...';
+const META_ACCESS_TOKEN = 'EAAWQKUKP670BSCC6hAlUTwTeqReFyuZCZCMGPWMpzrr73D1Iiqc2Ay4U0FNrPNvSm4JYYCjbmdIEDr0nLzZAQ5NMmigxK4dtmcKVoq8CzEdw2ZAAEFlsK1dOC5jWLqjSQ9d8xiimrTKTeNVhM6ASFDamHM3RxKPvE4BgfMan2StSQTjQi84WKkr6HSk1Kh7dcQZDZD';
+const WEBFLOW_SECRET = '';
 const EVENT_NAME = process.env.EVENT_NAME || 'Lead';
 // =========================
 

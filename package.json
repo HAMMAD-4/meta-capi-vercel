@@ -1,0 +1,14 @@
+{
+  "name": "webflow-meta-capi",
+  "version": "1.0.0",
+  "description": "Webflow form submissions to Meta Conversions API",
+  "main": "api/webhook.js",
+  "scripts": {
+    "deploy": "vercel --prod"
+  },
+  "type": "commonjs",
+  "dependencies": {},
+  "devDependencies": {
+    "vercel": "^34.0.0"
+  }
+}

@@ -14,13 +14,19 @@ function hashData(value) {
   return crypto.createHash('sha256').update(cleanValue).digest('hex');
 }
 
+
+
 // function extractFormData(reqBody) {
+//   // Log the entire structure to debug
+//   console.log('🔍 Full reqBody structure:', JSON.stringify(reqBody, null, 2));
+  
 //   // Webflow sends data in: reqBody.payload.data
 //   const payloadData = reqBody.payload || reqBody.data || reqBody;
-//   const formData = payloadData.data || payloadData;
+//   console.log('🔍 payloadData keys:', Object.keys(payloadData));
   
-//   console.log('🔍 Form data keys:', Object.keys(formData));
-//   console.log('🔍 Full form data:', JSON.stringify(formData, null, 2));
+//   const formData = payloadData.data || payloadData;
+//   console.log('🔍 formData keys:', Object.keys(formData));
+//   console.log('🔍 Full formData:', JSON.stringify(formData, null, 2));
   
 //   return {
 //     email: formData['email-2'] || formData.Email || formData.email || '',
@@ -33,22 +39,26 @@ function hashData(value) {
 // }
 
 function extractFormData(reqBody) {
-  // Log the entire structure to debug
-  console.log('🔍 Full reqBody structure:', JSON.stringify(reqBody, null, 2));
-  
-  // Webflow sends data in: reqBody.payload.data
   const payloadData = reqBody.payload || reqBody.data || reqBody;
-  console.log('🔍 payloadData keys:', Object.keys(payloadData));
-  
   const formData = payloadData.data || payloadData;
-  console.log('🔍 formData keys:', Object.keys(formData));
-  console.log('🔍 Full formData:', JSON.stringify(formData, null, 2));
+  
+  console.log('🔍 Form data keys:', Object.keys(formData));
   
   return {
-    email: formData['email-2'] || formData.Email || formData.email || '',
-    firstName: formData['name-2'] || formData.Name || formData.name || '',
-    message: formData['field-9'] || formData.Message || formData.message || '',
-    phone: formData['phone-2'] || formData.Phone || formData.phone || '',
+    // Contact Form fields (existing)
+    firstName: formData['Name 2'] || formData.Name || formData.name || '',
+    email: formData['Email 2'] || formData.Email || formData.email || '',
+    message: formData['Tell us about your project'] || formData.Message || formData.message || '',
+    
+    // Hire Form fields (NEW)
+    hireName: formData['Name'] || '',
+    hireEmail: formData['Email'] || '',
+    techStack: formData['Tech-Stack'] || '',
+    duration: formData['Duration'] || '',
+    developerCount: formData['Developers-Count'] || '',
+    hireProjectDetails: formData['Project-Details'] || '',
+    
+    // Form identification
     formId: formData._form || payloadData.formId || '',
     url: formData.url || payloadData.pageUrl || '',
   };
@@ -94,11 +104,28 @@ module.exports = async function handler(req, res) {
       firstName: formData.firstName || '(empty)',
       message: formData.message ? formData.message.substring(0, 50) + '...' : '(empty)',
     });
+     
+    // ===== EVENT DETECTION - ADD THIS HERE =====
+    // Determine which event to send based on form data
+    let eventName = EVENT_NAME; // Default: 'Lead'
+
+    // Check if this is the Hire Form (check for Hire Form specific fields)
+    if (formData.techStack || formData.duration || formData.developerCount) {
+    eventName = 'Hire Developers';
+    console.log('🔍 Detected Hire Form - using event: Hire Developers');
+    } else if (formData.message || formData['Tell us about your project']) {
+    eventName = 'Lead';
+    console.log('🔍 Detected Contact Form - using event: Lead');
+    } else {
+    console.log('🔍 Using default event:', eventName);
+    }
+    // ===== END EVENT DETECTION =====
 
     // Hash PII data
     const hashedEmail = hashData(formData.email);
     const hashedPhone = hashData(formData.phone);
     const hashedFirstName = hashData(formData.firstName);
+    
 
     const clientIP = req.headers['x-forwarded-for']?.split(',')[0] || req.socket?.remoteAddress || '';
     const userAgent = req.headers['user-agent'] || '';
@@ -111,16 +138,25 @@ module.exports = async function handler(req, res) {
         action_source: 'website',
         event_source_url: formData.url || 'https://www.webbugs.com',
         user_data: {
-          em: hashedEmail ? [hashedEmail] : [],
-          ph: hashedPhone ? [hashedPhone] : [],
-          fn: hashedFirstName ? [hashedFirstName] : [],
-          client_ip_address: clientIP,
-          client_user_agent: userAgent,
+        em: hashedEmail ? [hashedEmail] : [],
+        ph: hashedPhone ? [hashedPhone] : [],
+        fn: hashedFirstName ? [hashedFirstName] : [],
+        client_ip_address: clientIP,
+        client_user_agent: userAgent,
         },
         custom_data: {
-          message: formData.message,
-          form_id: formData.formId,
-          site_url: 'https://www.webbugs.com',
+        // Contact Form data
+        message: formData.message || '',
+        
+        // Hire Form data
+        tech_stack: formData.techStack || '',
+        duration: formData.duration || '',
+        developer_count: formData.developerCount || '',
+        project_details: formData.hireProjectDetails || '',
+        
+        // Common data
+        form_id: formData.formId,
+        site_url: 'https://www.webbugs.com',
         },
         event_id: `${formData.formId || 'form'}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
       }]

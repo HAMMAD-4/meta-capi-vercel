@@ -14,17 +14,23 @@ function hashData(value) {
   return crypto.createHash('sha256').update(cleanValue).digest('hex');
 }
 
-function extractFormData(payload) {
-  const data = payload.data || payload;
-  console.log('🔍 Looking for fields in:', Object.keys(data));
+function extractFormData(reqBody) {
+  // Webflow sends form data inside the 'payload' object
+  const payloadData = reqBody.payload || reqBody.data || reqBody;
+  
+  console.log('🔍 Looking for fields in:', Object.keys(payloadData));
+  console.log('🔍 Full payload structure:', JSON.stringify(payloadData, null, 2));
+  
+  // If payloadData has a 'data' field, use that
+  const formData = payloadData.data || payloadData;
   
   return {
-    email: data['email-2'] || data.Email || data.email || '',
-    firstName: data['name-2'] || data.Name || data.name || '',
-    message: data['field-9'] || data.Message || data.message || '',
-    phone: data['phone-2'] || data.Phone || data.phone || '',
-    formId: data._form || payload.formId || '',
-    url: data.url || payload.url || '',
+    email: formData['email-2'] || formData.Email || formData.email || '',
+    firstName: formData['name-2'] || formData.Name || formData.name || '',
+    message: formData['field-9'] || formData.Message || formData.message || '',
+    phone: formData['phone-2'] || formData.Phone || formData.phone || '',
+    formId: formData._form || payloadData.formId || '',
+    url: formData.url || payloadData.url || '',
   };
 }
 

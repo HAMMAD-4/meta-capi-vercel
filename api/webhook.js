@@ -15,14 +15,12 @@ function hashData(value) {
 }
 
 function extractFormData(reqBody) {
-  // Webflow sends form data inside the 'payload' object
+  // Webflow sends data in: reqBody.payload.data
   const payloadData = reqBody.payload || reqBody.data || reqBody;
-  
-  console.log('🔍 Looking for fields in:', Object.keys(payloadData));
-  console.log('🔍 Full payload structure:', JSON.stringify(payloadData, null, 2));
-  
-  // If payloadData has a 'data' field, use that
   const formData = payloadData.data || payloadData;
+  
+  console.log('🔍 Form data keys:', Object.keys(formData));
+  console.log('🔍 Full form data:', JSON.stringify(formData, null, 2));
   
   return {
     email: formData['email-2'] || formData.Email || formData.email || '',
@@ -30,7 +28,7 @@ function extractFormData(reqBody) {
     message: formData['field-9'] || formData.Message || formData.message || '',
     phone: formData['phone-2'] || formData.Phone || formData.phone || '',
     formId: formData._form || payloadData.formId || '',
-    url: formData.url || payloadData.url || '',
+    url: formData.url || payloadData.pageUrl || '',
   };
 }
 

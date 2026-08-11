@@ -14,13 +14,35 @@ function hashData(value) {
   return crypto.createHash('sha256').update(cleanValue).digest('hex');
 }
 
+// function extractFormData(reqBody) {
+//   // Webflow sends data in: reqBody.payload.data
+//   const payloadData = reqBody.payload || reqBody.data || reqBody;
+//   const formData = payloadData.data || payloadData;
+  
+//   console.log('🔍 Form data keys:', Object.keys(formData));
+//   console.log('🔍 Full form data:', JSON.stringify(formData, null, 2));
+  
+//   return {
+//     email: formData['email-2'] || formData.Email || formData.email || '',
+//     firstName: formData['name-2'] || formData.Name || formData.name || '',
+//     message: formData['field-9'] || formData.Message || formData.message || '',
+//     phone: formData['phone-2'] || formData.Phone || formData.phone || '',
+//     formId: formData._form || payloadData.formId || '',
+//     url: formData.url || payloadData.pageUrl || '',
+//   };
+// }
+
 function extractFormData(reqBody) {
+  // Log the entire structure to debug
+  console.log('🔍 Full reqBody structure:', JSON.stringify(reqBody, null, 2));
+  
   // Webflow sends data in: reqBody.payload.data
   const payloadData = reqBody.payload || reqBody.data || reqBody;
-  const formData = payloadData.data || payloadData;
+  console.log('🔍 payloadData keys:', Object.keys(payloadData));
   
-  console.log('🔍 Form data keys:', Object.keys(formData));
-  console.log('🔍 Full form data:', JSON.stringify(formData, null, 2));
+  const formData = payloadData.data || payloadData;
+  console.log('🔍 formData keys:', Object.keys(formData));
+  console.log('🔍 Full formData:', JSON.stringify(formData, null, 2));
   
   return {
     email: formData['email-2'] || formData.Email || formData.email || '',

@@ -45,22 +45,18 @@ function verifyWebflowSignature(reqBody, signature, secret) {
  * ADJUST THESE FIELD NAMES TO MATCH YOUR WEBFLOW FORM
  */
 function extractFormData(payload) {
-  // Webflow sends form data inside the 'data' object
   const data = payload.data || payload;
   
-  // ⚠️ IMPORTANT: Change these to match YOUR form field names
-  // Common field names Webflow uses:
-  // - 'Email' or 'email' or 'Email Address'
-  // - 'Phone' or 'phone' or 'Phone Number'
-  // - 'Name' or 'name' or 'Full Name'
-  // - 'Message' or 'message' or 'Comments'
-  
   return {
-    email: data.Email || data.email || data['Email Address'] || '',
-    phone: data.Phone || data.phone || data['Phone Number'] || '',
-    firstName: data.Name || data.name || data['Full Name'] || '',
-    lastName: data['Last Name'] || data.lastName || '',
-    message: data.Message || data.message || data['Comments'] || '',
+    // Field names from your Webflow form
+    email: data['email-2'] || data.Email || data.email || '',
+    firstName: data['name-2'] || data.Name || data.name || '',
+    message: data['field-9'] || data.Message || data.message || '',
+    
+    // Phone - you may not have this field, but keeping it for compatibility
+    phone: data['phone-2'] || data.Phone || data.phone || '',
+    
+    // Additional useful data
     formId: data._form || payload.formId || '',
     url: data.url || payload.url || '',
   };
